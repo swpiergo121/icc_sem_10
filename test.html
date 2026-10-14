@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pokédex — Starter Ten</title>
+<style>
+  :root {
+    --bg:            #0b1020;
+    --bg-2:          #131a33;
+    --card:          #161d38;
+    --card-hover:    #1d2649;
+    --text:          #eef2ff;
+    --muted:         #8b95b8;
+    --ring:          rgba(255,255,255,.08);
+
+    /* Pokémon type colours */
+    --grass:  #63bc5a;
+    --poison: #ab6ac8;
+    --fire:   #ff9d55;
+    --flying: #8fa9de;
+    --water:  #4d90d5;
+    --bug:    #91c12f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    background:
+      radial-gradient(900px 500px at 12% -8%,  #1e2a5e 0%, transparent 60%),
+      radial-gradient(800px 500px at 88% 110%, #3a1f4d 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 3rem 1.25rem 4rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Header ---------- */
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto 3rem;
+    text-align: center;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--ring);
+    background: rgba(255,255,255,.03);
+    padding: .45rem .95rem;
+    border-radius: 999px;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero__badge::before {
+    content: "";
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #ff4d4d;
+    box-shadow: 0 0 0 3px rgba(255,77,77,.22);
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.1;
+    background: linear-gradient(100deg, #ffffff 15%, #8fa9de 55%, #ab6ac8 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    margin: 1rem auto 0;
+    max-width: 46ch;
+    color: var(--muted);
+    font-size: 1.02rem;
+    line-height: 1.65;
+  }
+
+  /* ---------- Grid ---------- */
+  .grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 1.4rem;
+  }
+
+  /* ---------- Card ---------- */
+  .card {
+    position: relative;
+    background: linear-gradient(165deg, var(--card) 0%, #121933 100%);
+    border: 1px solid var(--ring);
+    border-radius: 20px;
+    padding: 1.25rem 1.25rem 1.4rem;
+    overflow: hidden;
+    transition: transform .28s cubic-bezier(.2,.7,.3,1),
+                border-color .28s ease,
+                box-shadow .28s ease,
+                background .28s ease;
+  }
+
+  /* coloured glow that tints per type */
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: -40% 30% 55% -30%;
+    background: var(--glow, var(--water));
+    filter: blur(58px);
+    opacity: .22;
+    transition: opacity .28s ease;
+    pointer-events: none;
+  }
+
+  .card:hover,
+  .card:focus-within {
+    transform: translateY(-7px);
+    border-color: color-mix(in srgb, var(--glow) 55%, transparent);
+    box-shadow: 0 22px 45px -18px rgba(0,0,0,.85),
+                0 0 0 1px color-mix(in srgb, var(--glow) 30%, transparent);
+  }
+
+  .card:hover::before { opacity: .38; }
+
+  .card__dex {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    color: var(--muted);
+  }
+
+  .card__num { font-variant-numeric: tabular-nums; }
+
+  .card__dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--glow);
+    box-shadow: 0 0 10px var(--glow);
+  }
+
+  .card__figure {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 148px;
+    margin: .5rem 0 .9rem;
+  }
+
+  .card__figure::after {
+    content: "";
+    position: absolute;
+    bottom: 12px;
+    width: 78px; height: 13px;
+    border-radius: 50%;
+    background: #000;
+    filter: blur(11px);
+    opacity: .45;
+  }
+
+  .card__img {
+    position: relative;
+    z-index: 1;
+    max-height: 138px;
+    width: auto;
+    filter: drop-shadow(0 12px 16px rgba(0,0,0,.55));
+    transition: transform .35s cubic-bezier(.2,.7,.3,1);
+  }
+
+  .card:hover .card__img { transform: translateY(-6px) scale(1.07); }
+
+  .card__name {
+    font-size: 1.16rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    text-align: center;
+    margin-bottom: .7rem;
+  }
+
+  .types {
+    display: flex;
+    gap: .45rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .type {
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    padding: .32rem .7rem;
+    border-radius: 999px;
+    color: #0b1020;
+    background: var(--glow);
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.16);
+  }
+
+  /* ---------- Footer ---------- */
+  .foot {
+    max-width: 1100px;
+    margin: 3.5rem auto 0;
+    text-align: center;
+    font-size: .8rem;
+    color: #5f698c;
+  }
+
+  .foot a { color: #8fa9de; text-decoration: none; }
+  .foot a:hover { text-decoration: underline; }
+
+  @media (max-width: 480px) {
+    body { padding: 2rem 1rem 3rem; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+    .card { padding: 1rem 1rem 1.15rem; border-radius: 16px; }
+    .card__figure { height: 112px; margin: .35rem 0 .7rem; }
+    .card__img { max-height: 104px; }
+    .card__name { font-size: 1rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <span class="hero__badge">Kanto Region · Gen I</span>
+    <h1>The Starter Ten</h1>
+    <p>The first ten entries in the Pokédex — three classic starter lines and the first bug you ever caught.</p>
+  </header>
+
+  <main class="grid" id="grid" aria-label="Pokémon list"></main>
+
+  <footer class="foot">
+    Artwork served from the <a href="https://github.com/PokeAPI/sprites">PokeAPI sprites</a> repository ·
+    Data via <a href="https://pokeapi.co">PokéAPI</a>
+  </footer>
+
+<script>
+  const POKEMON = [
+    { id:  1, name: "Bulbasaur",  types: ["grass", "poison"] },
+    { id:  2, name: "Ivysaur",    types: ["grass", "poison"] },
+    { id:  3, name: "Venusaur",   types: ["grass", "poison"] },
+    { id:  4, name: "Charmander", types: ["fire"] },
+    { id:  5, name: "Charmeleon", types: ["fire"] },
+    { id:  6, name: "Charizard",  types: ["fire", "flying"] },
+    { id:  7, name: "Squirtle",   types: ["water"] },
+    { id:  8, name: "Wartortle",  types: ["water"] },
+    { id:  9, name: "Blastoise",  types: ["water"] },
+    { id: 10, name: "Caterpie",   types: ["bug"] }
+  ];
+
+  const TYPE_COLOR = {
+    grass:  "var(--grass)",
+    poison: "var(--poison)",
+    fire:   "var(--fire)",
+    flying: "var(--flying)",
+    water:  "var(--water)",
+    bug:    "var(--bug)"
+  };
+
+  const artUrl = id =>
+    `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+
+  const pad = n => String(n).padStart(3, "0");
+
+  document.getElementById("grid").innerHTML = POKEMON.map(p => `
+    <article class="card" style="--glow: ${TYPE_COLOR[p.types[0]]}">
+      <div class="card__dex">
+        <span class="card__num">#${pad(p.id)}</span>
+        <span class="card__dot" aria-hidden="true"></span>
+      </div>
+
+      <figure class="card__figure">
+        <img class="card__img"
+             src="${artUrl(p.id)}"
+             alt="Official artwork of ${p.name}"
+             width="475" height="475"
+             loading="lazy" decoding="async" />
+      </figure>
+
+      <h2 class="card__name">${p.name}</h2>
+
+      <div class="types">
+        ${p.types.map(t => `
+          <span class="type" style="--glow: ${TYPE_COLOR[t]}">${t}</span>
+        `).join("")}
+      </div>
+    </article>
+  `).join("");
+</script>
+
+</body>
+</html>
